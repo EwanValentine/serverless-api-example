@@ -138,16 +138,10 @@ func (h *handler) Delete(id string) (helpers.Response, error) {
 }
 
 func main() {
-	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("eu-west-1")},
-	)
+	usecase, err := users.Init()
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
-
-	tableName := os.Getenv("TABLE_NAME")
-	repository := users.NewDynamoDBRepository(dynamodb.New(sess), tableName)
-	usecase := &users.Usecase{Repository: repository}
 
 	h := &handler{usecase}
 	lambda.Start(helpers.Router(h))

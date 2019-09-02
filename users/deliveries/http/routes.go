@@ -9,6 +9,7 @@ import (
 	"github.com/EwanValentine/serverless-api-example/users"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
+	"log"
 	"net/http"
 	"os"
 	"time"
@@ -159,23 +160,18 @@ func (d *delivery) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func Routes() (*mux.Router, error) {
-	sess, err := session.NewSession(&aws.Config{
-		Region: aws.String("eu-west-1")},
-	)
+	usecase, err := users.Init()
 	if err != nil {
-		return nil, err
+		log.Panic(err)
 	}
 
-	tableName := os.Getenv("TABLE_NAME")
-	repository := users.NewDynamoDBRepository(dynamodb.New(sess), tableName)
-	usecase := &users.Usecase{Repository: repository}
 	delivery := &delivery{usecase}
 
 	r := mux.NewRouter()
 	r.HandleFunc("/users", delivery.Create).Methods("POST")
 	r.HandleFunc("/users", delivery.GetAll).Methods("GET")
 	r.HandleFunc("/users/{id}", delivery.Get).Methods("GET")
-	r.HandleFunc("/users/{id}", delivery.Update).Methods("PATCH")
+	r.HandleFunc("/users/{id}", delivery.Update).Methods("PUT")
 	r.HandleFunc("/users/{id}", delivery.Delete).Methods("DELETE")
 
 	return r, nil
