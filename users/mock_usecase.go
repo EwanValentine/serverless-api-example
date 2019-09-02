@@ -64,7 +64,7 @@ func (mr *MockrepositoryMockRecorder) GetAll(ctx interface{}) *gomock.Call {
 }
 
 // Update mocks base method
-func (m *Mockrepository) Update(ctx context.Context, id string, user *User) error {
+func (m *Mockrepository) Update(ctx context.Context, id string, user *UpdateUser) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Update", ctx, id, user)
 	ret0, _ := ret[0].(error)

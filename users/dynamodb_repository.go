@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
+	"log"
 )
 
 // DynamoDBRepository -
@@ -60,35 +61,42 @@ func (r *DynamoDBRepository) GetAll(ctx context.Context) ([]*User, error) {
 }
 
 type updateUser struct {
-	Name string `json:":name"`
-	Age uint32 `json:":age"`
+	Name string `json:":n"`
+	Age uint32 `json:":a"`
+	Email string `json:":e"`
 }
 
 type userKey struct {
-	ID string `json:"id"`
+	ID string `json:":id"`
 }
 
 // Update a user
-func (r *DynamoDBRepository) Update(ctx context.Context, id string, user *User) error {
+func (r *DynamoDBRepository) Update(ctx context.Context, id string, user *UpdateUser) error {
+	log.Println("id", id)
 	update, err := dynamodbattribute.MarshalMap(&updateUser{
 		Name: user.Name,
 		Age: user.Age,
+		Email: user.Email,
 	})
 	if err != nil {
 		return nil
 	}
 
-	key, err := dynamodbattribute.MarshalMap(userKey{ ID: id })
-	if err != nil {
-		return err
-	}
+	log.Println(update)
 
 	input := &dynamodb.UpdateItemInput{
-		Key: key,
-		ExpressionAttributeValues:   update,
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(id),
+			},
+		},
+		ExpressionAttributeValues:  update,
 		TableName:                   aws.String(r.tableName),
-		UpdateExpression:          aws.String("set user.name = :name, user.age = :age"),
+		UpdateExpression:          aws.String("set #uname = :n, age = :a, email = :e"),
 		ReturnValues:              aws.String("UPDATED_NEW"),
+		ExpressionAttributeNames: map[string]*string{
+			"#uname": aws.String("name"),
+		},
 	}
 	_, err = r.session.UpdateItemWithContext(ctx, input)
 	return err

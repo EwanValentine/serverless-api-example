@@ -80,8 +80,7 @@ func TestCanValidateUser(t *testing.T) {
 }
 
 func TestCanUpdateUser(t *testing.T) {
-	user := &User{
-		ID: "abc123",
+	user := &UpdateUser{
 		Name: "new name",
 		Email: "test@test.com",
 		Age: 20,
@@ -89,9 +88,9 @@ func TestCanUpdateUser(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	repo := NewMockrepository(ctrl)
-	repo.EXPECT().Update(context.Background(), user.ID, user).Return(nil)
+	repo.EXPECT().Update(context.Background(), "abc123", user).Return(nil)
 	uc := Usecase{repo}
-	err := uc.Update(context.Background(), user.ID, user)
+	err := uc.Update(context.Background(), "abc123", user)
 	assert.NoError(t, err)
 }
 

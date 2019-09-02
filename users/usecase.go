@@ -14,7 +14,7 @@ var (
 type repository interface {
 	Get(ctx context.Context, id string) (*User, error)
 	GetAll(ctx context.Context) ([]*User, error)
-	Update(ctx context.Context, id string, user *User) error
+	Update(ctx context.Context, id string, user *UpdateUser) error
 	Create(ctx context.Context, user *User) error
 	Delete(ctx context.Context, id string) error
 }
@@ -43,7 +43,7 @@ func (u *Usecase) GetAll(ctx context.Context) ([]*User, error) {
 }
 
 // Update a single user
-func (u *Usecase) Update(ctx context.Context, id string, user *User) error {
+func (u *Usecase) Update(ctx context.Context, id string, user *UpdateUser) error {
 	validate = validator.New()
 	if err := validate.Struct(user); err != nil {
 		validationErrors := err.(validator.ValidationErrors)

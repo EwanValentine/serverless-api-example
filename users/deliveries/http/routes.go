@@ -3,22 +3,18 @@ package http
 import (
 	"context"
 	"encoding/json"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/EwanValentine/serverless-api-example/users"
 	"github.com/gorilla/mux"
 	"go.uber.org/zap"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
 type usecase interface {
 	Get(ctx context.Context, id string) (*users.User, error)
 	GetAll(ctx context.Context) ([]*users.User, error)
-	Update(ctx context.Context, id string, user *users.User) error
+	Update(ctx context.Context, id string, user *users.UpdateUser) error
 	Create(ctx context.Context, user *users.User) error
 	Delete(ctx context.Context, id string) error
 }
@@ -99,7 +95,7 @@ func (d *delivery) Update(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	decoder := json.NewDecoder(r.Body)
-	user := &users.User{}
+	user := &users.UpdateUser{}
 	if err := decoder.Decode(&user); err != nil {
 		writeErr(w, err, logger)
 		return

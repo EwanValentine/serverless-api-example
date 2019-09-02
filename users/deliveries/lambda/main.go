@@ -6,20 +6,16 @@ import (
 	"github.com/EwanValentine/serverless-api-example/pkg/helpers"
 	"github.com/EwanValentine/serverless-api-example/users"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"go.uber.org/zap"
 	"log"
 	"net/http"
-	"os"
 	"time"
 )
 
 type usecase interface {
 	Get(ctx context.Context, id string) (*users.User, error)
 	GetAll(ctx context.Context) ([]*users.User, error)
-	Update(ctx context.Context, id string, user *users.User) error
+	Update(ctx context.Context, id string, user *users.UpdateUser) error
 	Create(ctx context.Context, user *users.User) error
 	Delete(ctx context.Context, id string) error
 }
@@ -78,13 +74,13 @@ func (h *handler) Update(id string, body []byte) (helpers.Response, error) {
 	logger.With(zap.String("id", id))
 	logger.Info("updating user")
 
-	user := &users.User{}
-	if err := json.Unmarshal(body, &user); err != nil {
+	updateUser := &users.UpdateUser{}
+	if err := json.Unmarshal(body, &updateUser); err != nil {
 		logger.Error(err.Error())
 		return helpers.Fail(err, http.StatusInternalServerError)
 	}
 
-	if err := h.usecase.Update(ctx, id, user); err != nil {
+	if err := h.usecase.Update(ctx, id, updateUser); err != nil {
 		logger.Error(err.Error())
 		return helpers.Fail(err, http.StatusInternalServerError)
 	}
