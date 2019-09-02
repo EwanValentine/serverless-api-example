@@ -82,8 +82,6 @@ func (r *DynamoDBRepository) Update(ctx context.Context, id string, user *Update
 		return nil
 	}
 
-	log.Println(update)
-
 	input := &dynamodb.UpdateItemInput{
 		Key: map[string]*dynamodb.AttributeValue{
 			"id": {
