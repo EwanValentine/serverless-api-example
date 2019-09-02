@@ -9,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"go.uber.org/zap"
 	"log"
 	"net/http"
 	"os"
@@ -31,10 +32,17 @@ const fiveSecondsTimeout = time.Second*5
 
 // Get a single user
 func (h *handler) Get(id string) (helpers.Response, error) {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+
+	logger.With(zap.String("id", id))
+	logger.Info("fetching user")
+
 	ctx, cancel := context.WithTimeout(context.Background(), fiveSecondsTimeout)
 	defer cancel()
 	user, err := h.usecase.Get(ctx, id)
 	if err != nil {
+		logger.Error(err.Error())
 		return helpers.Fail(err, http.StatusInternalServerError)
 	}
 
@@ -43,10 +51,16 @@ func (h *handler) Get(id string) (helpers.Response, error) {
 
 // GetAll users
 func (h *handler) GetAll() (helpers.Response, error) {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+
+	logger.Info("fetching all users")
+
 	ctx, cancel := context.WithTimeout(context.Background(), fiveSecondsTimeout)
 	defer cancel()
 	users, err := h.usecase.GetAll(ctx)
 	if err != nil {
+		logger.Error(err.Error())
 		return helpers.Fail(err, http.StatusInternalServerError)
 	}
 
@@ -55,14 +69,23 @@ func (h *handler) GetAll() (helpers.Response, error) {
 
 // Update a single user
 func (h *handler) Update(id string, body []byte) (helpers.Response, error) {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+
 	ctx, cancel := context.WithTimeout(context.Background(), fiveSecondsTimeout)
 	defer cancel()
+
+	logger.With(zap.String("id", id))
+	logger.Info("updating user")
+
 	user := &users.User{}
 	if err := json.Unmarshal(body, &user); err != nil {
+		logger.Error(err.Error())
 		return helpers.Fail(err, http.StatusInternalServerError)
 	}
 
 	if err := h.usecase.Update(ctx, id, user); err != nil {
+		logger.Error(err.Error())
 		return helpers.Fail(err, http.StatusInternalServerError)
 	}
 
@@ -73,14 +96,22 @@ func (h *handler) Update(id string, body []byte) (helpers.Response, error) {
 
 // Create a user
 func (h *handler) Create(body []byte) (helpers.Response, error) {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+
 	ctx, cancel := context.WithTimeout(context.Background(), fiveSecondsTimeout)
 	defer cancel()
+
+	logger.Info("creating user")
+
 	user := &users.User{}
 	if err := json.Unmarshal(body, &user); err != nil {
+		logger.Error(err.Error())
 		return helpers.Fail(err, http.StatusInternalServerError)
 	}
 
 	if err := h.usecase.Create(ctx, user); err != nil {
+		logger.Error(err.Error())
 		return helpers.Fail(err, http.StatusInternalServerError)
 	}
 
@@ -89,9 +120,15 @@ func (h *handler) Create(body []byte) (helpers.Response, error) {
 
 // Delete a user
 func (h *handler) Delete(id string) (helpers.Response, error) {
+	logger, _ := zap.NewProduction()
+	defer logger.Sync()
+
 	ctx, cancel := context.WithTimeout(context.Background(), fiveSecondsTimeout)
 	defer cancel()
+
+	logger.With(zap.String("id", id))
 	if err := h.usecase.Delete(ctx, id); err != nil {
+		logger.Error(err.Error())
 		return helpers.Fail(err, http.StatusInternalServerError)
 	}
 
@@ -110,7 +147,7 @@ func main() {
 
 	tableName := os.Getenv("TABLE_NAME")
 	repository := users.NewDynamoDBRepository(dynamodb.New(sess), tableName)
-	usecase := users.Usecase{repository}
+	usecase := &users.Usecase{Repository: repository}
 
 	h := &handler{usecase}
 	lambda.Start(helpers.Router(h))

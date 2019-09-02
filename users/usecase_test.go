@@ -44,15 +44,18 @@ func TestCanGetAllUsers(t *testing.T) {
 }
 
 func TestCanCreateUser(t *testing.T) {
+	expected := &User{
+		Name: "testing",
+		Email: "test@test.com",
+		Age: 30,
+	}
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	repo := NewMockrepository(ctrl)
+	repo.EXPECT().Create(context.Background(), expected).Return(nil)
 
 	uc := Usecase{repo}
-	err := uc.Create(context.Background(), &User{
-		Name: "testing",
-		Age: 30,
-	})
+	err := uc.Create(context.Background(), expected)
 
 	assert.NoError(t, err)
 }
@@ -64,22 +67,43 @@ func TestCanValidateUser(t *testing.T) {
 
 	uc := Usecase{repo}
 
-	users := map[string]*User{
-		"missing name, missing age": &User{}, // No required fields
-		"name must be greater than 1 characters long": &User{Name: "", Age: 0}, // Blank name
-		"name must be a string, age must be lower than 150": &User{Name: "123", Age: 200}, // Integers as name, age too high
+	users := []*User{
+		&User{}, // No required fields
+		&User{Name: "", Age: 0}, // Blank name
+		&User{Name: "123", Age: 200}, // Integers as name, age too high
+		&User{Email: "nope"},
 	}
-	for message, val := range users {
+	for _, val := range users {
 		err := uc.Create(context.Background(), val)
 		assert.Error(t, err)
-		assert.Equal(t, err.Error(), message)
 	}
 }
 
 func TestCanUpdateUser(t *testing.T) {
-
+	user := &User{
+		ID: "abc123",
+		Name: "new name",
+		Email: "test@test.com",
+		Age: 20,
+	}
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	repo := NewMockrepository(ctrl)
+	repo.EXPECT().Update(context.Background(), user.ID, user).Return(nil)
+	uc := Usecase{repo}
+	err := uc.Update(context.Background(), user.ID, user)
+	assert.NoError(t, err)
 }
 
 func TestCanDeleteUser(t *testing.T) {
-
+	user := &User{
+		ID: "abc123",
+	}
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	repo := NewMockrepository(ctrl)
+	repo.EXPECT().Delete(context.Background(), user.ID).Return(nil)
+	uc := Usecase{repo}
+	err := uc.Delete(context.Background(), user.ID)
+	assert.NoError(t, err)
 }

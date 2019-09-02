@@ -4,9 +4,12 @@ import (
 	"context"
 	"github.com/pkg/errors"
 	"gopkg.in/go-playground/validator.v9"
+	"github.com/google/uuid"
 )
 
-var validate *validator.Validate
+var (
+	validate *validator.Validate
+)
 
 type repository interface {
 	Get(ctx context.Context, id string) (*User, error)
@@ -18,12 +21,12 @@ type repository interface {
 
 // Usecase for interacting with users
 type Usecase struct {
-	repository repository
+	Repository repository
 }
 
 // Get a single user
 func (u *Usecase) Get(ctx context.Context, id string) (*User, error) {
-	user, err := u.repository.Get(ctx, id)
+	user, err := u.Repository.Get(ctx, id)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching a single user")
 	}
@@ -32,7 +35,7 @@ func (u *Usecase) Get(ctx context.Context, id string) (*User, error) {
 
 // GetAll gets all users
 func (u *Usecase) GetAll(ctx context.Context) ([]*User, error) {
-	users, err := u.repository.GetAll(ctx)
+	users, err := u.Repository.GetAll(ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "error fetching all users")
 	}
@@ -43,10 +46,11 @@ func (u *Usecase) GetAll(ctx context.Context) ([]*User, error) {
 func (u *Usecase) Update(ctx context.Context, id string, user *User) error {
 	validate = validator.New()
 	if err := validate.Struct(user); err != nil {
-		return errors.Wrap(err, "validation failed")
+		validationErrors := err.(validator.ValidationErrors)
+		return validationErrors
 	}
 
-	if err := u.repository.Update(ctx, id, user); err != nil {
+	if err := u.Repository.Update(ctx, id, user); err != nil {
 		return errors.Wrap(err, "error updating user")
 	}
 	return nil
@@ -55,20 +59,29 @@ func (u *Usecase) Update(ctx context.Context, id string, user *User) error {
 // Create a single user
 func (u *Usecase) Create(ctx context.Context, user *User) error {
 	validate = validator.New()
-	if err := validate.Struct(user); err != nil {
-		return errors.Wrap(err, "validation failed")
+	if err := validate.Struct(*user); err != nil {
+		validationErrors := err.(validator.ValidationErrors)
+		return validationErrors
 	}
 
-	if err := u.repository.Create(ctx, user); err != nil {
+	user.ID = u.newID()
+	if err := u.Repository.Create(ctx, user); err != nil {
 		return errors.Wrap(err, "error creating new user")
 	}
+
 	return nil
 }
 
 // Delete a single user
 func (u *Usecase) Delete(ctx context.Context, id string) error {
-	if err := u.repository.Delete(ctx, id); err != nil {
+	if err := u.Repository.Delete(ctx, id); err != nil {
 		return errors.Wrap(err, "error deleting user")
 	}
 	return nil
+}
+
+
+func (u *Usecase) newID() string {
+	uid := uuid.New()
+	return uid.String()
 }

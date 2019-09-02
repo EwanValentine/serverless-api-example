@@ -10,6 +10,8 @@ type handler interface {
 	Delete(id string) (Response, error)
 }
 
+// Router takes a lambda handler and returns a higher order function
+// which can route each request using the HTTP verb and path params.
 func Router(handler handler) func(Request) (Response, error) {
 	return func(req Request) (Response, error) {
 		switch req.HTTPMethod {

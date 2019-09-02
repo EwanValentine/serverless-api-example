@@ -1,0 +1,11 @@
+{
+  "name": "serverless-api-example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:EwanValentine/serverless-api-example.git",
+  "author": "ewanvalentine <ewan.valentine@peak.ai>",
+  "license": "MIT",
+  "dependencies": {
+    "serverless-jetpack": "^0.6.0"
+  }
+}
