@@ -1,6 +1,6 @@
 # Serverless API Example - Golang
 
-See write up here:
+See write up here: // Needs including
 
 ## Architecture
 This repo loosely follows Uncle Bob's clean architecture. The repo itself groups functionality related to a specific domain into its own package. In this case /users.
