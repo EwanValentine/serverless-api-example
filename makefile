@@ -1,6 +1,6 @@
 .PHONY: build clean deploy gomodgen run-local
 
-build: gomodgen
+build:
 	export GO111MODULE=on
 	env GOOS=linux go build -ldflags="-s -w" -o bin/users users/deliveries/lambda/main.go
 
@@ -16,4 +16,3 @@ gomodgen:
 
 run-local:
 	PORT=8005 TABLE_NAME=example-users go run cmd/server/main.go
-

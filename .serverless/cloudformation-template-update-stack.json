@@ -77,6 +77,30 @@
                       "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/serverless-api-example-dev*:*:*"
                     }
                   ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Resource": "*",
+                  "Action": [
+                    "xray:*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Resource": "*",
+                  "Action": [
+                    "dynamodb:*"
+                  ]
+                },
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "xray:PutTraceSegments",
+                    "xray:PutTelemetryRecords"
+                  ],
+                  "Resource": [
+                    "*"
+                  ]
                 }
               ]
             }
@@ -105,7 +129,7 @@
           "S3Bucket": {
             "Ref": "ServerlessDeploymentBucket"
           },
-          "S3Key": "serverless/serverless-api-example/dev/1567441220594-2019-09-02T16:20:20.594Z/serverless-api-example.zip"
+          "S3Key": "serverless/serverless-api-example/dev/1567529621225-2019-09-03T16:53:41.225Z/serverless-api-example.zip"
         },
         "FunctionName": "serverless-api-example-dev-users",
         "Handler": "bin/users",
@@ -117,21 +141,29 @@
           ]
         },
         "Runtime": "go1.x",
-        "Timeout": 6
+        "Timeout": 6,
+        "TracingConfig": {
+          "Mode": "Active"
+        },
+        "Environment": {
+          "Variables": {
+            "TABLE_NAME": "example-users"
+          }
+        }
       },
       "DependsOn": [
         "UsersLogGroup",
         "IamRoleLambdaExecution"
       ]
     },
-    "UsersLambdaVersionpPVOhSya55zIsFu9TwG8yszQnzacX2krFKS6JUq2AZU": {
+    "UsersLambdaVersionVZxysucnuKFzg80U4okkmX0IQzco7GDp84QI2wNM7o": {
       "Type": "AWS::Lambda::Version",
       "DeletionPolicy": "Retain",
       "Properties": {
         "FunctionName": {
           "Ref": "UsersLambdaFunction"
         },
-        "CodeSha256": "QKtzsWYMLIBg3JyHQduewP6A9RArrbAK66l8/7t/tmw="
+        "CodeSha256": "etuuZi01aoRZMwHNLdT8kTUv7+bhR+Q4s04DcUIA7kk="
       }
     },
     "ApiGatewayRestApi": {
@@ -250,7 +282,7 @@
         "MethodResponses": []
       }
     },
-    "ApiGatewayDeployment1567441211497": {
+    "ApiGatewayDeployment1567529611407": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
         "RestApiId": {
@@ -310,7 +342,7 @@
     "UsersLambdaFunctionQualifiedArn": {
       "Description": "Current Lambda function version",
       "Value": {
-        "Ref": "UsersLambdaVersionpPVOhSya55zIsFu9TwG8yszQnzacX2krFKS6JUq2AZU"
+        "Ref": "UsersLambdaVersionVZxysucnuKFzg80U4okkmX0IQzco7GDp84QI2wNM7o"
       }
     },
     "ServiceEndpoint": {

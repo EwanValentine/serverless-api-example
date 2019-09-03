@@ -117,15 +117,14 @@ func (r *DynamoDBRepository) Create(ctx context.Context, user *User) error {
 
 // Delete a user
 func (r *DynamoDBRepository) Delete(ctx context.Context, id string) error {
-	key, err := dynamodbattribute.MarshalMap(userKey{ ID: id })
-	if err != nil {
-		return err
-	}
-
 	input := &dynamodb.DeleteItemInput{
 		TableName: aws.String(r.tableName),
-		Key: key,
+		Key: map[string]*dynamodb.AttributeValue{
+			"id": {
+				S: aws.String(id),
+			},
+		},
 	}
-	_, err = r.session.DeleteItemWithContext(ctx, input)
+	_, err := r.session.DeleteItemWithContext(ctx, input)
 	return err
 }

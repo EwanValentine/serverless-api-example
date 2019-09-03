@@ -6,6 +6,18 @@ provider:
   region: "eu-west-1"
   name: aws
   runtime: go1.x
+  tracing:
+    apiGateway: true
+    lambda: true
+  iamRoleStatements:
+    - Effect: "Allow"
+      Resource: "*"
+      Action:
+        - "xray:*"
+    - Effect: "Allow"
+      Resource: "*"
+      Action:
+        - "dynamodb:*"
 
 custom:
   - serverless-jetpack
@@ -21,7 +33,6 @@ functions:
     handler: bin/users
     environment:
       TABLE_NAME: "example-users"
-      AWS_REGION: "eu-west-1"
     events:
       - http:
           path: /{any+}
