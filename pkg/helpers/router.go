@@ -14,7 +14,7 @@ type handler interface {
 	Delete(ctx context.Context, id string) (Response, error)
 }
 
-const fiveSecondsTimeout = time.Second*5
+const fiveSecondsTimeout = time.Second * 5
 
 // Router takes a lambda handler and returns a higher order function
 // which can route each request using the HTTP verb and path params.

@@ -1,10 +1,10 @@
 package main
 
 import (
-	"net/http"
-	"os"
 	delivery "github.com/EwanValentine/serverless-api-example/users/deliveries/http"
 	"log"
+	"net/http"
+	"os"
 )
 
 func main() {

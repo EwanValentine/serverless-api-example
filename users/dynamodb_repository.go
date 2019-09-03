@@ -10,7 +10,7 @@ import (
 
 // DynamoDBRepository -
 type DynamoDBRepository struct {
-	session *dynamodb.DynamoDB
+	session   *dynamodb.DynamoDB
 	tableName string
 }
 
@@ -61,8 +61,8 @@ func (r *DynamoDBRepository) GetAll(ctx context.Context) ([]*User, error) {
 }
 
 type updateUser struct {
-	Name string `json:":n"`
-	Age uint32 `json:":a"`
+	Name  string `json:":n"`
+	Age   uint32 `json:":a"`
 	Email string `json:":e"`
 }
 
@@ -74,8 +74,8 @@ type userKey struct {
 func (r *DynamoDBRepository) Update(ctx context.Context, id string, user *UpdateUser) error {
 	log.Println("id", id)
 	update, err := dynamodbattribute.MarshalMap(&updateUser{
-		Name: user.Name,
-		Age: user.Age,
+		Name:  user.Name,
+		Age:   user.Age,
 		Email: user.Email,
 	})
 	if err != nil {
@@ -88,8 +88,8 @@ func (r *DynamoDBRepository) Update(ctx context.Context, id string, user *Update
 				S: aws.String(id),
 			},
 		},
-		ExpressionAttributeValues:  update,
-		TableName:                   aws.String(r.tableName),
+		ExpressionAttributeValues: update,
+		TableName:                 aws.String(r.tableName),
 		UpdateExpression:          aws.String("set #uname = :n, age = :a, email = :e"),
 		ReturnValues:              aws.String("UPDATED_NEW"),
 		ExpressionAttributeNames: map[string]*string{
@@ -108,7 +108,7 @@ func (r *DynamoDBRepository) Create(ctx context.Context, user *User) error {
 	}
 
 	input := &dynamodb.PutItemInput{
-		Item: item,
+		Item:      item,
 		TableName: aws.String(r.tableName),
 	}
 	_, err = r.session.PutItemWithContext(ctx, input)

@@ -13,8 +13,8 @@ import (
 )
 
 var (
-	id = ""
-	validUser = `{ "name": "Test User", "email": "test@test.com", "age": 30 }`
+	id          = ""
+	validUser   = `{ "name": "Test User", "email": "test@test.com", "age": 30 }`
 	updatedUser = `{ "name": "Updated User", "email": "test@test.com", "age": 30 }`
 )
 
@@ -43,7 +43,6 @@ func clear() {
 	}
 }
 
-
 func TestCanCreate(t *testing.T) {
 	ctx := context.Background()
 	user := &users.User{}
@@ -51,7 +50,7 @@ func TestCanCreate(t *testing.T) {
 	h := setup()
 	req := helpers.Request{
 		HTTPMethod: "POST",
-		Body: validUser,
+		Body:       validUser,
 	}
 	res, err := helpers.Router(h)(ctx, req)
 	assert.NoError(t, err)

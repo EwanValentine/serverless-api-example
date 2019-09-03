@@ -8,7 +8,7 @@ import (
 // LoggerAdapter wraps the usecase interface
 // with a logging adapter which can be swapped out
 type LoggerAdapter struct {
-	Logger *zap.Logger
+	Logger  *zap.Logger
 	Usecase UserService
 }
 

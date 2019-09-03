@@ -20,7 +20,7 @@ func Fail(err error, status int) (Response, error) {
 	body, _ := json.Marshal(e)
 
 	return Response{
-		Body: string(body),
+		Body:       string(body),
 		StatusCode: status,
 	}, nil
 }
@@ -33,7 +33,7 @@ func Success(data interface{}, status int) (Response, error) {
 	}
 
 	return Response{
-		Body: string(body),
+		Body:       string(body),
 		StatusCode: status,
 	}, nil
 }

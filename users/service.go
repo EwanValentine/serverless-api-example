@@ -1,12 +1,12 @@
 package users
 
 import (
+	"context"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-xray-sdk-go/xray"
 	"go.uber.org/zap"
-	"context"
 	"os"
 )
 
@@ -41,7 +41,7 @@ func Init(integration bool) (UserService, error) {
 	tableName := os.Getenv("TABLE_NAME")
 	repository := NewDynamoDBRepository(ddb, tableName)
 	usecase := &LoggerAdapter{
-		Logger: logger,
+		Logger:  logger,
 		Usecase: &Usecase{Repository: repository},
 	}
 	return usecase, nil

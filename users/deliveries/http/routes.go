@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const fiveSecondsTimeout = time.Second*5
+const fiveSecondsTimeout = time.Second * 5
 
 type delivery struct {
 	usecase users.UserService

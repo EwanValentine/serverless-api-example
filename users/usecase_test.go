@@ -45,9 +45,9 @@ func TestCanGetAllUsers(t *testing.T) {
 
 func TestCanCreateUser(t *testing.T) {
 	expected := &User{
-		Name: "testing",
+		Name:  "testing",
 		Email: "test@test.com",
-		Age: 30,
+		Age:   30,
 	}
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -68,8 +68,8 @@ func TestCanValidateUser(t *testing.T) {
 	uc := Usecase{repo}
 
 	users := []*User{
-		&User{}, // No required fields
-		&User{Name: "", Age: 0}, // Blank name
+		&User{},                      // No required fields
+		&User{Name: "", Age: 0},      // Blank name
 		&User{Name: "123", Age: 200}, // Integers as name, age too high
 		&User{Email: "nope"},
 	}
@@ -81,9 +81,9 @@ func TestCanValidateUser(t *testing.T) {
 
 func TestCanUpdateUser(t *testing.T) {
 	user := &UpdateUser{
-		Name: "new name",
+		Name:  "new name",
 		Email: "test@test.com",
-		Age: 20,
+		Age:   20,
 	}
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

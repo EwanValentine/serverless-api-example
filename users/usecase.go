@@ -2,9 +2,9 @@ package users
 
 import (
 	"context"
+	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"gopkg.in/go-playground/validator.v9"
-	"github.com/google/uuid"
 )
 
 var (
@@ -79,7 +79,6 @@ func (u *Usecase) Delete(ctx context.Context, id string) error {
 	}
 	return nil
 }
-
 
 func (u *Usecase) newID() string {
 	uid := uuid.New()
