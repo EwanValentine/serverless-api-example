@@ -3,11 +3,12 @@ package http
 import (
 	"context"
 	"encoding/json"
-	"github.com/EwanValentine/serverless-api-example/users"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/EwanValentine/serverless-api-example/users"
+	"github.com/gorilla/mux"
 )
 
 const fiveSecondsTimeout = time.Second * 5
@@ -120,8 +121,9 @@ func (d *delivery) Delete(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Deleted"))
 }
 
+// Routes -
 func Routes() (*mux.Router, error) {
-	usecase, err := users.Init(false)
+	usecase, err := users.Init(true)
 	if err != nil {
 		log.Panic(err)
 	}

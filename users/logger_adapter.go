@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+
 	"go.uber.org/zap"
 )
 

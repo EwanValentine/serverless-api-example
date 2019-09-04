@@ -155,7 +155,7 @@
                 "S3Bucket": {
                   "Ref": "ServerlessDeploymentBucket"
                 },
-                "S3Key": "serverless/serverless-api-example/dev/1567529621225-2019-09-03T16:53:41.225Z/serverless-api-example.zip"
+                "S3Key": "serverless/serverless-api-example/dev/1567613691338-2019-09-04T16:14:51.338Z/serverless-api-example.zip"
               },
               "FunctionName": "serverless-api-example-dev-users",
               "Handler": "bin/users",
@@ -203,7 +203,7 @@
               }
             }
           },
-          "ApiGatewayResourceAnyVar": {
+          "ApiGatewayResourceUsers": {
             "Type": "AWS::ApiGateway::Resource",
             "Properties": {
               "ParentId": {
@@ -212,13 +212,25 @@
                   "RootResourceId"
                 ]
               },
-              "PathPart": "{any+}",
+              "PathPart": "users",
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
             }
           },
-          "ApiGatewayMethodAnyVarOptions": {
+          "ApiGatewayResourceUsersIdVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceUsers"
+              },
+              "PathPart": "{id}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodUsersOptions": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
               "AuthorizationType": "NONE",
@@ -258,20 +270,67 @@
                 ]
               },
               "ResourceId": {
-                "Ref": "ApiGatewayResourceAnyVar"
+                "Ref": "ApiGatewayResourceUsers"
               },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
               }
             }
           },
-          "ApiGatewayMethodAnyVarAny": {
+          "ApiGatewayMethodUsersIdVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true,
+                    "method.response.header.Access-Control-Allow-Credentials": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'*'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'",
+                      "method.response.header.Access-Control-Allow-Credentials": "'false'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\".*\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceUsersIdVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodUsersAny": {
             "Type": "AWS::ApiGateway::Method",
             "Properties": {
               "HttpMethod": "ANY",
               "RequestParameters": {},
               "ResourceId": {
-                "Ref": "ApiGatewayResourceAnyVar"
+                "Ref": "ApiGatewayResourceUsers"
               },
               "RestApiId": {
                 "Ref": "ApiGatewayRestApi"
@@ -308,7 +367,50 @@
               "MethodResponses": []
             }
           },
-          "ApiGatewayDeployment1567529611407": {
+          "ApiGatewayMethodUsersIdVarAny": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "ANY",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceUsersIdVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "UsersLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayDeployment1567613680517": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
               "RestApiId": {
@@ -317,8 +419,10 @@
               "StageName": "dev"
             },
             "DependsOn": [
-              "ApiGatewayMethodAnyVarOptions",
-              "ApiGatewayMethodAnyVarAny"
+              "ApiGatewayMethodUsersOptions",
+              "ApiGatewayMethodUsersIdVarOptions",
+              "ApiGatewayMethodUsersAny",
+              "ApiGatewayMethodUsersIdVarAny"
             ]
           },
           "UsersLambdaPermissionApiGateway": {
@@ -438,7 +542,33 @@
         "events": [
           {
             "http": {
-              "path": "{any+}",
+              "path": "users",
+              "method": "any",
+              "cors": {
+                "origins": [
+                  "*"
+                ],
+                "origin": "*",
+                "methods": [
+                  "OPTIONS",
+                  "ANY"
+                ],
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent"
+                ],
+                "allowCredentials": false
+              },
+              "integration": "AWS_PROXY"
+            }
+          },
+          {
+            "http": {
+              "path": "users/{id}",
               "method": "any",
               "cors": {
                 "origins": [
@@ -476,7 +606,7 @@
     "artifact": "/Users/ewanvalentine/code/serverless-api-example/.serverless/serverless-api-example.zip"
   },
   "package": {
-    "artifactDirectoryName": "serverless/serverless-api-example/dev/1567529621225-2019-09-03T16:53:41.225Z",
+    "artifactDirectoryName": "serverless/serverless-api-example/dev/1567613691338-2019-09-04T16:14:51.338Z",
     "artifact": "serverless-api-example.zip"
   }
 }

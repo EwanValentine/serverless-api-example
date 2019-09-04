@@ -35,6 +35,10 @@ functions:
       TABLE_NAME: "example-users"
     events:
       - http:
-          path: /{any+}
+          path: /users
+          method: ANY
+          cors: true
+      - http:
+          path: /users/{id}
           method: ANY
           cors: true
