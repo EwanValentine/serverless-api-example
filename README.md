@@ -10,6 +10,21 @@ The delivery layers include http, so you can run this repo as a standard web ser
 The business logic is written as use cases, and we include a repository for the data layer.
 
 ## Running
-As http: `$ make run-local // port 8005`.
 
-Or deploy with Serverless: `$ make deploy`.
+### Local
+
+If you want to run it localy with a plain http server execute the following command:
+
+```bash
+$ make run-local // port 8005
+```
+
+```
+$ curl localhost:8005 
+```
+
+### Serverless
+
+1. Apply the [example datastore](infrastructure/datastore.yml) with CloudFormation. This is required to provide an datastore with AWS DynamoDB for the Lambda Function to save data of the business logic.
+
+2. Deploy everything else Serverless: `$ make deploy`.
