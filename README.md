@@ -13,7 +13,7 @@ The business logic is written as use cases, and we include a repository for the 
 
 ### Local
 
-If you want to run it localy with a plain http server execute the following command:
+If you want to run it locally with a plain http server execute the following command:
 
 ```bash
 $ make run-local // port 8005
